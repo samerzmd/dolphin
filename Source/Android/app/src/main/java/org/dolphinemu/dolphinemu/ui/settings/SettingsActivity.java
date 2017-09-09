@@ -13,6 +13,9 @@ import android.widget.Toast;
 import org.dolphinemu.dolphinemu.BuildConfig;
 import org.dolphinemu.dolphinemu.R;
 import org.dolphinemu.dolphinemu.model.settings.SettingSection;
+import org.dolphinemu.dolphinemu.services.DirectoryInitializationService;
+import org.dolphinemu.dolphinemu.utils.Log;
+import org.dolphinemu.dolphinemu.utils.PermissionsHandler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -177,6 +180,14 @@ public final class SettingsActivity extends AppCompatActivity implements Setting
 
 	public static void launch(Context context, String menuTag)
 	{
+		if (!PermissionsHandler.hasWriteAccess(context))
+		{
+			Log.error("Settings could not be opened because write permission is not granted");
+			return;
+		}
+
+		DirectoryInitializationService.waitForExternalStorageInitialization();
+
 		Intent settings = new Intent(context, SettingsActivity.class);
 
 		settings.putExtra(ARGUMENT_FILE_NAME, menuTag);
